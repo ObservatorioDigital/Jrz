@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Observatorio Juárez — observatorio ciudadano sobre servicios públicos, seguridad y rendición de cuentas en Ciudad Juárez, Chihuahua." />
+  <title>Observatorio Juárez — Ciudad Juárez bajo la lupa</title>
+
+  <!-- Google Fonts: Oswald (display, caps) + Public Sans (UI/cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Leaflet 1.9.4 CSS (unpkg CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ============================ SKIP LINK ============================ -->
+<a class="skip-link" href="#inicio">Saltar al contenido</a>
+
+<!-- Barra de progreso de lectura -->
+<div id="scroll-progress" class="scroll-progress" aria-hidden="true"></div>
+
+<!-- ============================ NAV ============================ -->
+<header>
+  <nav id="nav" aria-label="Navegación principal">
+    <div class="nav-inner">
+      <a class="nav-logo" href="#inicio" aria-label="Observatorio Juárez — inicio">
+        <span class="nav-logo-chip" aria-hidden="true">
+          <svg class="nav-logo-icon" viewBox="0 0 24 24" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2" />
+            <line x1="15.2" y1="15.2" x2="21" y2="21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="nav-logo-text">Observatorio<br />Juárez</span>
+      </a>
+
+      <button
+        id="nav-toggle"
+        class="nav-toggle"
+        aria-label="Abrir menú"
+        aria-controls="nav-menu"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul id="nav-menu" class="nav-menu">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#panorama">Sobre el proyecto</a></li>
+        <li><a href="#infografia">Problemáticas</a></li>
+        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#notas">Notas</a></li>
+        <li><a href="#cronologia">Línea del tiempo</a></li>
+        <li><a href="#mapas">Mapa ciudadano</a></li>
+        <li><a href="#mapa-denuncias">Reportar</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li class="nav-cta-li"><a class="nav-cta" href="#contacto">Donar</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- ============================ HERO ============================ -->
+  <section id="inicio" class="hero" aria-labelledby="hero-title">
+    <div class="hero-media" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <button
+        id="video-placeholder"
+        class="hero-play"
+        type="button"
+        data-video-id=""
+        aria-label="Reproducir video introductorio (próximamente)"
+      >
+        <svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">
+          <circle cx="40" cy="40" r="38" fill="none" stroke="currentColor" stroke-width="3" />
+          <path d="M33 26 L58 40 L33 54 Z" fill="currentColor" />
+        </svg>
+      </button>
+
+      <h1 id="hero-title" class="hero-title">Ciudad Juárez bajo la lupa</h1>
+
+      <p class="hero-sub">
+        Observatorio ciudadano sobre servicios públicos, seguridad y rendición de cuentas.
+      </p>
+
+      <form id="subscribe-form" class="subscribe-form" novalidate>
+        <label class="visually-hidden" for="subscribe-email">Correo electrónico</label>
+        <input
+          id="subscribe-email"
+          class="subscribe-input"
+          type="email"
+          name="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="Tu correo electrónico"
+          required
+        />
+        <button class="subscribe-btn" type="submit">Suscríbete</button>
+      </form>
+      <p id="subscribe-msg" class="subscribe-msg" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ============================ STATS (tarjeta flotante) ============================ -->
+  <section id="stats" class="stats" aria-label="Cifras del observatorio">
+    <div class="stats-card reveal" data-stagger>
+      <div class="stat">
+        <span class="stat-chip stat-chip--green" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="stat-num counter stat-num--green" data-target="96">0</span>
+        <span class="stat-label">Colonias<br />reportando</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-chip stat-chip--red" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span class="stat-num counter stat-num--red" data-target="245">0</span>
+        <span class="stat-label">Días<br />documentados</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-chip stat-chip--green" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="9" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M15 14c2.6 0 4.5 1.8 4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span class="stat-num counter stat-num--green" data-target="465">0</span>
+        <span class="stat-label">Reportes<br />ciudadanos</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-chip stat-chip--red" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+        </span>
+        <span class="stat-num counter stat-num--red" data-target="36000" data-suffix="+">0</span>
+        <span class="stat-label">Vistas<br />acumuladas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PANORAMA (3 tarjetas) ============================ -->
+  <section id="panorama" class="panorama">
+    <div class="panorama-grid">
+      <!-- ---- (a) INFOGRAFÍA ---- -->
+      <article id="infografia" class="card card-info reveal">
+        <p class="card-kicker card-kicker--green">Infografía</p>
+        <h2 class="card-title">Temas más señalados</h2>
+
+        <div class="info-body">
+          <ul class="temas">
+            <li class="tema">
+              <div class="tema-head">
+                <span class="tema-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M4 19L10 5h4l6 14M8 19l1.5-4h5L16 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="tema-name">Baches</span>
+                <span class="tema-pct">32%</span>
+              </div>
+              <div class="tema-rail"><span class="tema-bar tema-bar--baches" data-pct="32"></span></div>
+            </li>
+
+            <li class="tema">
+              <div class="tema-head">
+                <span class="tema-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M6 7l1 13h10l1-13M4 7h16M9 7V5h6v2M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="tema-name">Basura</span>
+                <span class="tema-pct">24%</span>
+              </div>
+              <div class="tema-rail"><span class="tema-bar tema-bar--basura" data-pct="24"></span></div>
+            </li>
+
+            <li class="tema">
+              <div class="tema-head">
+                <span class="tema-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M14 3l4 4-8 8-4 1 1-4 8-8zM4 20h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="tema-name">Limpia</span>
+                <span class="tema-pct">18%</span>
+              </div>
+              <div class="tema-rail"><span class="tema-bar tema-bar--limpia" data-pct="18"></span></div>
+            </li>
+
+            <li class="tema">
+              <div class="tema-head">
+                <span class="tema-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M3 21h18M5 21V9l7-4 7 4v12M10 21v-6h4v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="tema-name">Obra pública</span>
+                <span class="tema-pct">14%</span>
+              </div>
+              <div class="tema-rail"><span class="tema-bar tema-bar--obra" data-pct="14"></span></div>
+            </li>
+
+            <li class="tema">
+              <div class="tema-head">
+                <span class="tema-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M3 17V9l2-4h14l2 4v8M3 17h18M3 17v2h3v-2M18 17v2h3v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.5" cy="13.5" r="1.3" fill="currentColor"/><circle cx="16.5" cy="13.5" r="1.3" fill="currentColor"/></svg>
+                </span>
+                <span class="tema-name">Movilidad</span>
+                <span class="tema-pct">12%</span>
+              </div>
+              <div class="tema-rail"><span class="tema-bar tema-bar--movilidad" data-pct="12"></span></div>
+            </li>
+          </ul>
+
+          <div class="info-donut" aria-hidden="true">
+            <div class="donut"></div>
+          </div>
+        </div>
+
+        <a class="card-link card-link--red" href="#infografia">Ver infografía completa →</a>
+      </article>
+
+      <!-- ---- (b) VIDEO INTRODUCTORIO ---- -->
+      <article class="card card-video reveal">
+        <p class="card-kicker card-kicker--green">Video introductorio</p>
+        <h2 class="card-title">1 minuto</h2>
+
+        <a class="video-thumb" href="#inicio" aria-label="Ver el video introductorio en la parte superior">
+          <span class="video-thumb-play" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="3" />
+              <path d="M26 21 L46 32 L26 43 Z" fill="currentColor" />
+            </svg>
+          </span>
+        </a>
+        <p class="video-cap">Conoce el proyecto y por qué es importante vigilar nuestra ciudad.</p>
+      </article>
+
+      <!-- ---- (c) GALERÍA ---- -->
+      <article id="galeria" class="card card-galeria reveal">
+        <p class="card-kicker card-kicker--green">Galería fotográfica</p>
+        <h2 class="card-title">Los días difíciles de Juárez</h2>
+
+        <div id="galeria-grid" class="galeria-grid">
+          <p class="empty-note">Las fotografías se cargarán aquí.</p>
+        </div>
+
+        <a class="card-link card-link--red" href="#galeria">Ver galería completa →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================ NOTAS (blog) ============================ -->
+  <section id="notas" class="notas" aria-labelledby="notas-title">
+    <div class="notas-inner">
+      <div class="notas-head reveal">
+        <p class="notas-kicker">
+          <span class="notas-kicker-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v15a2 2 0 0 0 2 2H5a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7h7M9 11h7M9 15h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          El blog del observatorio
+        </p>
+        <h2 id="notas-title" class="notas-title">Notas del observatorio</h2>
+        <p class="notas-sub">
+          Investigaciones, reportajes y opinión sobre la vida pública de Ciudad Juárez.
+          Lee las notas completas y deja tu comentario.
+        </p>
+      </div>
+
+      <div id="notas-grid" class="notas-grid">
+        <p class="empty-note">Las notas se cargarán aquí.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ BANDA LÍNEA DEL TIEMPO ============================ -->
+  <div class="timeline-band" role="presentation">
+    <div class="timeline-band-inner">
+      <span class="timeline-band-dash" aria-hidden="true"></span>
+      <span class="timeline-band-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <h2 class="timeline-band-title">Línea del tiempo / Cronología del atraco a Cd. Juárez</h2>
+      <span class="timeline-band-dash" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- ============================ CRONOLOGÍA ============================ -->
+  <section id="cronologia" class="cronologia">
+    <p class="section-intro reveal">
+      De la simulación del bacheo al crematorio clandestino: cuatro años de casos
+      documentados por auditorías, fiscalías y prensa durante el gobierno de
+      Cruz Pérez Cuéllar. Cada hecho tiene fecha, monto y fuente.
+    </p>
+
+    <div class="timeline-stats reveal" data-stagger>
+      <div class="tstat">
+        <span class="tstat-num counter" data-target="235" data-suffix="+ MDP">0</span>
+        <span class="tstat-label">en desvíos y contratos bajo sospecha</span>
+      </div>
+      <div class="tstat">
+        <span class="tstat-num counter" data-target="380">0</span>
+        <span class="tstat-label">cuerpos en el Crematorio Plenitud</span>
+      </div>
+      <div class="tstat">
+        <span class="tstat-num counter" data-target="12">0</span>
+        <span class="tstat-label">casos documentados 2022–2026</span>
+      </div>
+    </div>
+
+    <div class="timeline-legend reveal" role="list" aria-label="Categorías de la cronología">
+      <span role="listitem"><i class="legend-dot legend-dot--corrupcion" aria-hidden="true"></i>Corrupción</span>
+      <span role="listitem"><i class="legend-dot legend-dot--seguridad" aria-hidden="true"></i>Seguridad</span>
+      <span role="listitem"><i class="legend-dot legend-dot--transparencia" aria-hidden="true"></i>Transparencia</span>
+    </div>
+
+    <div id="timeline" class="timeline">
+      <p class="empty-note">La línea del tiempo se cargará aquí.</p>
+    </div>
+  </section>
+
+  <!-- ============================ MAPAS ============================ -->
+  <section id="mapas" class="mapas">
+    <div class="mapas-grid">
+      <!-- Mapa 1: baches en vivo (bachesjrz.com) -->
+      <div class="mapa-card reveal">
+        <h3 class="mapa-title mapa-title--green">
+          Mapa interactivo
+          <span class="live-badge"><span class="live-dot" aria-hidden="true"></span>EN VIVO</span>
+        </h3>
+
+        <p class="mapa-desc">
+          Mapa de baches en tiempo real, alimentado con reportes ciudadanos de
+          <a href="https://bachesjrz.com" target="_blank" rel="noopener">bachesjrz.com</a>.
+        </p>
+
+        <div class="mapa mapa--iframe">
+          <iframe
+            src="https://bachesjrz.com/mapa"
+            title="Mapa de baches de Ciudad Juárez — bachesjrz.com"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+
+        <div class="mapa-actions">
+          <a class="btn btn-green" href="https://bachesjrz.com" target="_blank" rel="noopener">Abrir bachesjrz.com →</a>
+        </div>
+      </div>
+
+      <!-- Mapa 2: denuncias -->
+      <div class="mapa-card reveal" id="denuncias">
+        <h3 class="mapa-title mapa-title--red">Mapa de denuncias</h3>
+
+        <ul class="denuncia-list">
+          <li><span class="dot dot-red" aria-hidden="true"></span>Mal gobierno</li>
+          <li><span class="dot dot-red" aria-hidden="true"></span>Falta de transparencia</li>
+          <li><span class="dot dot-red" aria-hidden="true"></span>Casos en investigación</li>
+          <li><span class="dot dot-red" aria-hidden="true"></span>Abusos policiales</li>
+          <li><span class="dot dot-red" aria-hidden="true"></span>Corrupción</li>
+        </ul>
+
+        <div id="mapa-denuncias" class="mapa" role="application" aria-label="Mapa de denuncias de seguridad pública de Ciudad Juárez"></div>
+
+        <p id="denuncia-hint" class="denuncia-hint" hidden>
+          Haz clic en el punto del mapa donde ocurrió el hecho para ubicar tu denuncia.
+        </p>
+
+        <div class="mapa-actions mapa-actions--row">
+          <button id="btn-denunciar" class="btn btn-red" type="button">Hacer denuncia →</button>
+          <a class="btn btn-outline" href="#mapa-denuncias">Consultar denuncias</a>
+        </div>
+        <p class="disclaimer">
+          Contenido basado en reportes ciudadanos y notas públicas. Toda persona
+          es inocente hasta que se demuestre lo contrario.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ MEMES ============================ -->
+  <section id="memes" class="memes">
+    <div class="memes-head reveal">
+      <h2 class="memes-title">
+        <span class="memes-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v6c0 4-3.5 7-8 7s-8-3-8-7V5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="15" cy="10" r="1.3" fill="currentColor"/><path d="M9 13.5c1.5 1.2 4.5 1.2 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        Galería de memes
+      </h2>
+    </div>
+
+    <div class="memes-viewport">
+      <button id="memes-prev" class="memes-arrow memes-arrow--prev" type="button" aria-label="Anterior">‹</button>
+
+      <div id="memes-track" class="memes-track reveal" tabindex="0" aria-label="Galería de memes, desplazable">
+        <p class="empty-note">Los memes se cargarán aquí.</p>
+      </div>
+
+      <button id="memes-next" class="memes-arrow memes-arrow--next" type="button" aria-label="Siguiente">›</button>
+    </div>
+  </section>
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer id="contacto" class="footer">
+  <div class="footer-inner">
+    <p class="footer-lema reveal">«Una ciudad vigilada por su gente, es una ciudad que puede cambiar.»</p>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <p class="footer-place">
+      Cd. Juárez, Chihuahua, México
+      <span class="footer-flag" aria-label="Bandera de México" role="img">
+        <svg viewBox="0 0 30 20" focusable="false">
+          <rect width="10" height="20" x="0" fill="#006847"/>
+          <rect width="10" height="20" x="10" fill="#ffffff"/>
+          <rect width="10" height="20" x="20" fill="#ce1126"/>
+          <circle cx="15" cy="10" r="2.4" fill="none" stroke="#7a5230" stroke-width="0.8"/>
+        </svg>
+      </span>
+    </p>
+    <span class="footer-sep footer-sep--mobile-hide" aria-hidden="true"></span>
+    <nav class="footer-legal" aria-label="Enlaces legales">
+      <a href="#contacto">Aviso de privacidad</a>
+      <a href="mailto:contacto@observatoriojuarez.mx">Contacto</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ============================ LIGHTBOX ============================ -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Fotografía ampliada" aria-hidden="true">
+  <button id="lightbox-close" class="lightbox-close" type="button" aria-label="Cerrar">×</button>
+  <figure class="lightbox-figure">
+    <img id="lightbox-img" class="lightbox-img" alt="" />
+    <figcaption id="lightbox-caption" class="lightbox-caption"></figcaption>
+  </figure>
+</div>
+
+<!-- ============================ NOTA MODAL (lector) ============================ -->
+<div id="nota-modal" class="nota-modal" role="dialog" aria-modal="true" aria-label="Nota completa" aria-hidden="true">
+  <div class="nota-modal-inner">
+    <button id="nota-modal-close" class="nota-modal-close" type="button" aria-label="Cerrar nota">×</button>
+    <article id="nota-article" class="nota-article"></article>
+  </div>
+</div>
+
+<!-- ============================ VIDEO MODAL ============================ -->
+<div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video introductorio" aria-hidden="true">
+  <div class="video-modal-inner">
+    <button class="video-modal-close" type="button" aria-label="Cerrar video" data-close-video>×</button>
+    <div class="video-modal-frame video-modal-body">
+      <p class="video-modal-msg">Video próximamente.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ SCRIPTS ============================ -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
