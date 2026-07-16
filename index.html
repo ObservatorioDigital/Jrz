@@ -60,8 +60,10 @@
         <li><a href="#inicio">Inicio</a></li>
         <li><a href="#panorama">Sobre el proyecto</a></li>
         <li><a href="#infografia">Problemáticas</a></li>
-        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#galeria">El cartel</a></li>
         <li><a href="#notas">Notas</a></li>
+        <li><a href="#expedientes">Expedientes</a></li>
+        <li><a href="#tranzas">Videos</a></li>
         <li><a href="#cronologia">Línea del tiempo</a></li>
         <li><a href="#mapas">Mapa ciudadano</a></li>
         <li><a href="#mapa-denuncias">Reportar</a></li>
@@ -224,6 +226,36 @@
           </div>
         </div>
 
+        <div class="vs-block">
+          <p class="vs-title">El discurso vs. los datos</p>
+
+          <div class="vs-row">
+            <div class="vs-head">
+              <span class="vs-label">Policías «dados de baja» según el discurso oficial</span>
+              <span class="vs-num">400+</span>
+            </div>
+            <div class="tema-rail"><span class="tema-bar vs-bar--discurso" data-pct="100"></span></div>
+          </div>
+
+          <div class="vs-row">
+            <div class="vs-head">
+              <span class="vs-label">Sancionados según los registros de transparencia</span>
+              <span class="vs-num vs-num--red">219</span>
+            </div>
+            <div class="tema-rail"><span class="tema-bar vs-bar--datos" data-pct="55"></span></div>
+          </div>
+
+          <div class="vs-row">
+            <div class="vs-head">
+              <span class="vs-label">Removidos de forma definitiva, sin reingreso</span>
+              <span class="vs-num vs-num--red">31</span>
+            </div>
+            <div class="tema-rail"><span class="tema-bar vs-bar--datos" data-pct="8"></span></div>
+          </div>
+
+          <p class="vs-fuente">Fuente: registros obtenidos por transparencia (La Verdad Juárez, nov 2025).</p>
+        </div>
+
         <a class="card-link card-link--red" href="#infografia">Ver infografía completa →</a>
       </article>
 
@@ -241,18 +273,30 @@
           </span>
         </a>
         <p class="video-cap">Conoce el proyecto y por qué es importante vigilar nuestra ciudad.</p>
-      </article>
 
-      <!-- ---- (c) GALERÍA ---- -->
-      <article id="galeria" class="card card-galeria reveal">
-        <p class="card-kicker card-kicker--green">Galería fotográfica</p>
-        <h2 class="card-title">Los días difíciles de Juárez</h2>
-
-        <div id="galeria-grid" class="galeria-grid">
-          <p class="empty-note">Las fotografías se cargarán aquí.</p>
+        <div id="video-tranzas" class="video-tranzas" hidden>
+          <p class="video-tranzas-title">De la videoteca</p>
+          <div id="video-tranzas-list"></div>
         </div>
 
-        <a class="card-link card-link--red" href="#galeria">Ver galería completa →</a>
+        <a class="card-link card-link--red" href="#tranzas">Ver todos los videos →</a>
+      </article>
+
+      <!-- ---- (c) LOS MÁS BUSCADOS (cartel) ---- -->
+      <article id="galeria" class="card card-galeria reveal">
+        <p class="card-kicker card-kicker--green">Los más buscados</p>
+        <h2 class="card-title">El cartel de Cruz</h2>
+
+        <div id="galeria-grid" class="cartel-grid">
+          <p class="empty-note">El cartel se cargará aquí.</p>
+        </div>
+
+        <p class="cartel-hint">
+          Once señalados y un jefe al centro. Toca cualquier rostro para abrir
+          su expediente con los señalamientos y las notas de prensa que lo documentan.
+        </p>
+
+        <a class="card-link card-link--red" href="#expedientes">Abrir los expedientes →</a>
       </article>
     </div>
   </section>
@@ -276,6 +320,54 @@
 
       <div id="notas-grid" class="notas-grid">
         <p class="empty-note">Las notas se cargarán aquí.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ EXPEDIENTES (personajes señalados) ============================ -->
+  <section id="expedientes" class="expedientes" aria-labelledby="expedientes-title">
+    <div class="expedientes-inner">
+      <div class="expedientes-head reveal">
+        <p class="expedientes-kicker">
+          <span class="expedientes-kicker-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M4 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 10h16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </span>
+          Expedientes ciudadanos
+        </p>
+        <h2 id="expedientes-title" class="expedientes-title">¿Quién es quién en el atraco a Juárez?</h2>
+        <p class="expedientes-sub">
+          Funcionarios y personajes del entorno del gobierno municipal señalados por la prensa
+          y por reportes ciudadanos. Cada ficha abre un expediente con los señalamientos y las
+          notas periodísticas que los documentan.
+        </p>
+      </div>
+
+      <div id="expedientes-grid" class="expedientes-grid">
+        <p class="empty-note">Los expedientes se cargarán aquí.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================ TRANZAS (videoteca) ============================ -->
+  <section id="tranzas" class="tranzas" aria-labelledby="tranzas-title">
+    <div class="tranzas-inner">
+      <div class="tranzas-head reveal">
+        <p class="tranzas-kicker">
+          <span class="tranzas-kicker-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="5" width="13" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 10l6-3.5v11l-6-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </span>
+          Videoteca ciudadana
+        </p>
+        <h2 id="tranzas-title" class="tranzas-title">Las tranzas del más chueco</h2>
+        <p class="tranzas-sub">
+          La corrupción del gobierno municipal explicada en piezas cortas de video,
+          como circulan de celular en celular. Míralas, júzgalas y compártelas.
+        </p>
+      </div>
+
+      <div id="tranzas-grid" class="tranzas-grid">
+        <p class="empty-note">Los videos se cargarán aquí.</p>
       </div>
     </div>
   </section>
@@ -446,6 +538,25 @@
   <div class="nota-modal-inner">
     <button id="nota-modal-close" class="nota-modal-close" type="button" aria-label="Cerrar nota">×</button>
     <article id="nota-article" class="nota-article"></article>
+  </div>
+</div>
+
+<!-- ============================ EXPEDIENTE MODAL ============================ -->
+<div id="exp-modal" class="nota-modal exp-modal" role="dialog" aria-modal="true" aria-label="Expediente" aria-hidden="true">
+  <div class="nota-modal-inner">
+    <button id="exp-modal-close" class="nota-modal-close" type="button" aria-label="Cerrar expediente">×</button>
+    <article id="exp-article" class="nota-article exp-article"></article>
+  </div>
+</div>
+
+<!-- ============================ TRANZA MODAL (reproductor) ============================ -->
+<div id="tranza-modal" class="tranza-modal" role="dialog" aria-modal="true" aria-label="Video de la videoteca" aria-hidden="true">
+  <div class="tranza-modal-inner">
+    <button id="tranza-modal-close" class="nota-modal-close" type="button" aria-label="Cerrar video">×</button>
+    <figure class="tranza-player">
+      <video id="tranza-video" controls playsinline preload="metadata"></video>
+      <figcaption id="tranza-caption" class="tranza-caption"></figcaption>
+    </figure>
   </div>
 </div>
 
