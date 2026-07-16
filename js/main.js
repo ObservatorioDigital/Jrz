@@ -186,69 +186,99 @@ document.addEventListener('DOMContentLoaded', function () {
   })();
 
   /* ----------------------------------------------------------------------
-     4. Gallery grid (#galeria-grid) populated from FOTOS + lightbox
+     4a. Lightbox close wiring (used by the memes gallery)
      ---------------------------------------------------------------------- */
-  (function initGallery() {
-    var grid = document.getElementById('galeria-grid');
-    if (!grid || typeof FOTOS === 'undefined') return;
-
-    removeEmptyNotes(grid);
-
-    FOTOS.forEach(function (foto) {
-      var item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'galeria-item reveal';
-      item.style.background = foto.gradient;
-      item.setAttribute('aria-label', foto.tema + ' — ' + foto.colonia);
-      item.setAttribute('data-caption', foto.caption);
-
-      var label = document.createElement('span');
-      label.className = 'galeria-caption';
-      label.textContent = foto.tema + ' — ' + foto.colonia;
-      item.appendChild(label);
-
-      grid.appendChild(item);
-      if (window.__ojObserve) window.__ojObserve(item);
-    });
-
-    // Lightbox handling.
+  (function initLightbox() {
     var lightbox = document.getElementById('lightbox');
-    var lightboxImg = document.getElementById('lightbox-img');
-    var lightboxCaption = document.getElementById('lightbox-caption');
+    if (!lightbox) return;
     var lightboxClose = document.getElementById('lightbox-close');
 
-    function openLightbox(caption, gradient) {
-      if (!lightbox) return;
-      if (lightboxCaption) lightboxCaption.textContent = caption;
-      // No real image files: mirror the placeholder gradient into the img area.
-      if (lightboxImg) {
-        lightboxImg.removeAttribute('src'); // clear any meme image shown before
-        lightboxImg.style.background = gradient;
-      }
-      lightbox.classList.add('open');
-      lightbox.setAttribute('aria-hidden', 'false');
-    }
-
     function closeLightbox() {
-      if (!lightbox) return;
       lightbox.classList.remove('open');
       lightbox.setAttribute('aria-hidden', 'true');
     }
 
-    grid.addEventListener('click', function (e) {
-      var item = e.target.closest('.galeria-item');
-      if (!item) return;
-      openLightbox(item.getAttribute('data-caption'), item.style.background);
-    });
-
     if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-    if (lightbox) {
-      lightbox.addEventListener('click', function (e) {
-        if (e.target === lightbox) closeLightbox(); // click on backdrop
-      });
-    }
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox(); // click on backdrop
+    });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeLightbox();
+    });
+  })();
+
+  /* ----------------------------------------------------------------------
+     4b. Cartel "Los más buscados" (#galeria-grid): 3x4 de PERSONAJES con
+     CARTEL_CENTRO al centro. Clic en un rostro -> abre su expediente.
+     ---------------------------------------------------------------------- */
+  (function initCartel() {
+    var grid = document.getElementById('galeria-grid');
+    if (!grid || typeof PERSONAJES === 'undefined' || typeof CARTEL_CENTRO === 'undefined') return;
+
+    removeEmptyNotes(grid);
+
+    function cellInitials(nombre) {
+      var parts = nombre.trim().split(/\s+/);
+      return ((parts[0] ? parts[0].charAt(0) : '') + (parts[1] ? parts[1].charAt(0) : '')).toUpperCase();
+    }
+
+    function makeCell(opts) {
+      var cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'cartel-cell reveal' + (opts.jefe ? ' cartel-cell--jefe' : '');
+      cell.setAttribute('aria-label', opts.aria);
+
+      var img = document.createElement('img');
+      img.src = opts.foto || '';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.addEventListener('error', function () {
+        var mono = document.createElement('span');
+        mono.className = 'cartel-mono';
+        mono.textContent = cellInitials(opts.nombre);
+        if (img.parentNode) img.parentNode.replaceChild(mono, img);
+      });
+      cell.appendChild(img);
+
+      var label = document.createElement('span');
+      label.className = 'cartel-label';
+      label.textContent = opts.etiqueta;
+      cell.appendChild(label);
+
+      cell.addEventListener('click', opts.onClick);
+      return cell;
+    }
+
+    // 3 columns x 4 rows: center cell (index 4, row 2 col 2) is the boss.
+    var cells = [];
+    PERSONAJES.forEach(function (p, index) {
+      cells.push(makeCell({
+        nombre: p.nombre,
+        etiqueta: p.nombre,
+        foto: p.foto,
+        aria: 'Abrir expediente de ' + p.nombre,
+        onClick: function () {
+          if (window.__ojOpenExpediente) window.__ojOpenExpediente(p, index);
+        }
+      }));
+    });
+
+    var jefe = makeCell({
+      nombre: CARTEL_CENTRO.nombre,
+      etiqueta: CARTEL_CENTRO.etiqueta,
+      foto: CARTEL_CENTRO.foto,
+      jefe: true,
+      aria: CARTEL_CENTRO.nombre + ' — ver todos los expedientes',
+      onClick: function () {
+        var section = document.getElementById('expedientes');
+        if (section) section.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    cells.splice(4, 0, jefe);
+
+    cells.forEach(function (cell) {
+      grid.appendChild(cell);
+      if (window.__ojObserve) window.__ojObserve(cell);
     });
   })();
 
@@ -794,6 +824,418 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeNota();
+    });
+  })();
+
+  /* ----------------------------------------------------------------------
+     6e. Expedientes (#expedientes-grid): fichas de personajes + modal
+     ---------------------------------------------------------------------- */
+  (function initExpedientes() {
+    var grid = document.getElementById('expedientes-grid');
+    if (!grid || typeof PERSONAJES === 'undefined') return;
+
+    removeEmptyNotes(grid);
+
+    var modal = document.getElementById('exp-modal');
+    var article = document.getElementById('exp-article');
+    var closeBtn = document.getElementById('exp-modal-close');
+
+    var ESTADO_LABEL = { doc: 'Documentado en prensa', ver: 'Reporte ciudadano' };
+
+    function expNum(index) {
+      return 'Exp. Nº ' + String(index + 1).padStart(3, '0');
+    }
+
+    function initials(nombre) {
+      var parts = nombre.trim().split(/\s+/);
+      var first = parts[0] ? parts[0].charAt(0) : '';
+      var second = parts[1] ? parts[1].charAt(0) : '';
+      return (first + second).toUpperCase();
+    }
+
+    // <img> that swaps itself for a monogram block if the file is missing.
+    function retrato(p, withNote) {
+      var img = document.createElement('img');
+      img.src = p.foto || '';
+      img.alt = 'Retrato de ' + p.nombre;
+      img.loading = 'lazy';
+      img.addEventListener('error', function () {
+        var mono = document.createElement('div');
+        mono.className = 'exp-mono';
+        mono.setAttribute('role', 'img');
+        mono.setAttribute('aria-label', p.nombre + ' (sin fotografía)');
+
+        var ini = document.createElement('span');
+        ini.className = 'exp-mono-initials';
+        ini.textContent = initials(p.nombre);
+        mono.appendChild(ini);
+
+        if (withNote) {
+          var note = document.createElement('span');
+          note.className = 'exp-mono-note';
+          note.textContent = 'Foto pendiente';
+          mono.appendChild(note);
+        }
+        if (img.parentNode) img.parentNode.replaceChild(mono, img);
+      });
+      return img;
+    }
+
+    function statusChip(p) {
+      var chip = document.createElement('span');
+      chip.className = 'exp-status exp-status--' + (p.estado === 'doc' ? 'doc' : 'ver');
+      chip.textContent = ESTADO_LABEL[p.estado] || ESTADO_LABEL.ver;
+      return chip;
+    }
+
+    /* ---- modal ---- */
+
+    function openExpediente(p, index) {
+      if (!modal || !article) return;
+      article.innerHTML = '';
+
+      var head = document.createElement('div');
+      head.className = 'exp-head';
+
+      var photo = document.createElement('div');
+      photo.className = 'exp-head-photo';
+      photo.appendChild(retrato(p, false));
+      head.appendChild(photo);
+
+      var info = document.createElement('div');
+      info.className = 'exp-head-info';
+
+      var num = document.createElement('span');
+      num.className = 'exp-head-num';
+      num.textContent = expNum(index) + ' — ' + (ESTADO_LABEL[p.estado] || ESTADO_LABEL.ver);
+      info.appendChild(num);
+
+      var nombre = document.createElement('h2');
+      nombre.className = 'exp-head-nombre';
+      nombre.textContent = p.nombre;
+      info.appendChild(nombre);
+
+      var cargo = document.createElement('p');
+      cargo.className = 'exp-head-cargo';
+      cargo.textContent = p.cargo + (p.entidad ? ' — ' + p.entidad : '');
+      info.appendChild(cargo);
+
+      var tags = document.createElement('div');
+      tags.className = 'exp-tags';
+      var tag = document.createElement('span');
+      tag.className = 'exp-tag';
+      tag.textContent = p.sello;
+      tags.appendChild(tag);
+      info.appendChild(tags);
+
+      head.appendChild(info);
+      article.appendChild(head);
+
+      var hSen = document.createElement('h3');
+      hSen.textContent = 'Señalamientos';
+      article.appendChild(hSen);
+
+      (p.resumen || []).forEach(function (texto) {
+        var par = document.createElement('p');
+        par.textContent = texto;
+        article.appendChild(par);
+      });
+
+      var hNotas = document.createElement('h3');
+      hNotas.textContent = 'Notas de prensa (' + ((p.notas || []).length) + ')';
+      article.appendChild(hNotas);
+
+      if (p.notas && p.notas.length) {
+        var list = document.createElement('ul');
+        list.className = 'exp-notas-list';
+        p.notas.forEach(function (n) {
+          var li = document.createElement('li');
+          if (n.url) {
+            var link = document.createElement('a');
+            link.href = n.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = n.titulo;
+            li.appendChild(link);
+          } else {
+            var span = document.createElement('span');
+            span.className = 'exp-nota-sin-url';
+            span.textContent = n.titulo;
+            li.appendChild(span);
+          }
+          var meta = document.createElement('span');
+          meta.className = 'exp-nota-meta';
+          meta.textContent = n.medio + (n.fecha ? ' · ' + n.fecha : '') +
+            (n.verificada === false ? ' · enlace por verificar' : '');
+          li.appendChild(meta);
+          list.appendChild(li);
+        });
+        article.appendChild(list);
+      } else {
+        var empty = document.createElement('p');
+        empty.className = 'exp-notas-empty';
+        empty.textContent = 'Aún no hay notas de prensa vinculadas a este expediente.';
+        article.appendChild(empty);
+      }
+
+      if (p.fotoCredito) {
+        var credito = document.createElement('p');
+        credito.className = 'disclaimer';
+        credito.textContent = p.fotoCredito + '.';
+        article.appendChild(credito);
+      }
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      article.scrollTop = 0;
+    }
+
+    function closeExpediente() {
+      if (!modal) return;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    /* ---- cards ---- */
+
+    var totalNotas = 0;
+
+    PERSONAJES.forEach(function (p, index) {
+      totalNotas += (p.notas || []).length;
+
+      var card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'exp-card reveal';
+      card.setAttribute('aria-label', 'Abrir expediente de ' + p.nombre);
+
+      var top = document.createElement('div');
+      top.className = 'exp-card-top';
+      var num = document.createElement('span');
+      num.className = 'exp-num';
+      num.textContent = expNum(index);
+      top.appendChild(num);
+      top.appendChild(statusChip(p));
+      card.appendChild(top);
+
+      var photo = document.createElement('div');
+      photo.className = 'exp-photo';
+      photo.appendChild(retrato(p, true));
+
+      var stamp = document.createElement('span');
+      stamp.className = 'exp-stamp' + (p.estado === 'ver' ? ' exp-stamp--ver' : '');
+      stamp.textContent = p.sello;
+      photo.appendChild(stamp);
+      card.appendChild(photo);
+
+      var body = document.createElement('div');
+      body.className = 'exp-body';
+
+      var inner = document.createElement('div');
+      var nombre = document.createElement('h3');
+      nombre.className = 'exp-nombre';
+      nombre.textContent = p.nombre;
+      inner.appendChild(nombre);
+
+      var cargo = document.createElement('p');
+      cargo.className = 'exp-cargo';
+      cargo.textContent = p.cargo;
+      inner.appendChild(cargo);
+      body.appendChild(inner);
+
+      var foot = document.createElement('div');
+      foot.className = 'exp-card-foot';
+      var nNotas = document.createElement('span');
+      var count = (p.notas || []).length;
+      nNotas.textContent = count === 1 ? '1 nota de prensa' : count + ' notas de prensa';
+      foot.appendChild(nNotas);
+      var open = document.createElement('span');
+      open.className = 'exp-open';
+      open.textContent = 'Abrir →';
+      foot.appendChild(open);
+      body.appendChild(foot);
+
+      card.appendChild(body);
+      card.addEventListener('click', function () { openExpediente(p, index); });
+
+      grid.appendChild(card);
+      if (window.__ojObserve) window.__ojObserve(card);
+    });
+
+    // Counter line under the section subtitle.
+    var head = document.querySelector('.expedientes-head');
+    if (head) {
+      var countRow = document.createElement('p');
+      countRow.className = 'expedientes-count';
+      var docCount = PERSONAJES.filter(function (p) { return p.estado === 'doc'; }).length;
+      countRow.innerHTML =
+        '<span><strong>' + PERSONAJES.length + '</strong> expedientes abiertos</span>' +
+        '<span><strong>' + totalNotas + '</strong> notas de prensa vinculadas</span>' +
+        '<span><strong>' + docCount + '</strong> con señalamientos documentados</span>';
+      head.appendChild(countRow);
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeExpediente);
+    if (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeExpediente();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeExpediente();
+    });
+
+    // Allow other sections (cartel "Los más buscados") to open expedientes.
+    window.__ojOpenExpediente = openExpediente;
+  })();
+
+  /* ----------------------------------------------------------------------
+     6f. Tranzas (#tranzas-grid): videoteca vertical + modal reproductor
+     ---------------------------------------------------------------------- */
+  (function initTranzas() {
+    var grid = document.getElementById('tranzas-grid');
+    if (!grid || typeof TRANZAS === 'undefined') return;
+
+    removeEmptyNotes(grid);
+
+    var modal = document.getElementById('tranza-modal');
+    var video = document.getElementById('tranza-video');
+    var caption = document.getElementById('tranza-caption');
+    var closeBtn = document.getElementById('tranza-modal-close');
+
+    var ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+      '<path d="M6 4.5 L20 12 L6 19.5 Z" fill="currentColor"/></svg>';
+    var ICON_FWD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+      '<path d="M14 5l7 6-7 6v-4C7 13 4 15 3 18c0-6 4-9 11-9V5z"/></svg>';
+
+    function openTranza(t) {
+      if (!modal || !video) return;
+      video.poster = t.poster || '';
+      video.src = t.src;
+      if (caption) {
+        caption.innerHTML = '';
+        var strong = document.createElement('strong');
+        strong.textContent = t.titulo;
+        caption.appendChild(strong);
+        caption.appendChild(document.createTextNode(t.desc || ''));
+      }
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      var playing = video.play();
+      if (playing && playing.catch) playing.catch(function () { /* autoplay blocked: user taps play */ });
+    }
+
+    function closeTranza() {
+      if (!modal) return;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (video) {
+        video.pause();
+        video.removeAttribute('src'); // stop buffering the file
+        video.load();
+      }
+    }
+
+    TRANZAS.forEach(function (t) {
+      var card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'tranza-card reveal';
+      card.setAttribute('aria-label', 'Reproducir video: ' + t.titulo + ' (' + t.dur + ')');
+
+      var screen = document.createElement('div');
+      screen.className = 'tranza-screen';
+
+      var img = document.createElement('img');
+      img.src = t.poster;
+      img.alt = '';
+      img.loading = 'lazy';
+      screen.appendChild(img);
+
+      var fwd = document.createElement('span');
+      fwd.className = 'tranza-fwd';
+      fwd.innerHTML = ICON_FWD;
+      fwd.appendChild(document.createTextNode('Reenviado muchas veces'));
+      screen.appendChild(fwd);
+
+      var play = document.createElement('span');
+      play.className = 'tranza-play';
+      play.innerHTML = ICON_PLAY;
+      screen.appendChild(play);
+
+      var dur = document.createElement('span');
+      dur.className = 'tranza-dur';
+      dur.textContent = t.dur;
+      screen.appendChild(dur);
+
+      card.appendChild(screen);
+
+      var info = document.createElement('div');
+      info.className = 'tranza-info';
+
+      var name = document.createElement('h3');
+      name.className = 'tranza-name';
+      name.textContent = t.titulo;
+      info.appendChild(name);
+
+      var desc = document.createElement('p');
+      desc.className = 'tranza-desc';
+      desc.textContent = t.desc;
+      info.appendChild(desc);
+
+      card.appendChild(info);
+      card.addEventListener('click', function () { openTranza(t); });
+
+      grid.appendChild(card);
+      if (window.__ojObserve) window.__ojObserve(card);
+    });
+
+    // Mini-lista "De la videoteca" dentro de la tarjeta del video introductorio.
+    var miniWrap = document.getElementById('video-tranzas');
+    var miniList = document.getElementById('video-tranzas-list');
+    if (miniWrap && miniList) {
+      TRANZAS.slice(0, 3).forEach(function (t) {
+        var row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'video-tranza-row';
+        row.setAttribute('aria-label', 'Reproducir video: ' + t.titulo + ' (' + t.dur + ')');
+
+        var thumb = document.createElement('img');
+        thumb.className = 'video-tranza-thumb';
+        thumb.src = t.poster;
+        thumb.alt = '';
+        thumb.loading = 'lazy';
+        row.appendChild(thumb);
+
+        var meta = document.createElement('span');
+        meta.className = 'video-tranza-meta';
+        var titulo = document.createElement('span');
+        titulo.className = 'video-tranza-titulo';
+        titulo.textContent = t.titulo;
+        var dur = document.createElement('span');
+        dur.className = 'video-tranza-dur';
+        dur.textContent = t.dur + ' · Reenviado muchas veces';
+        meta.appendChild(titulo);
+        meta.appendChild(dur);
+        row.appendChild(meta);
+
+        row.addEventListener('click', function () { openTranza(t); });
+        miniList.appendChild(row);
+      });
+      miniWrap.hidden = false;
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeTranza);
+    if (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeTranza();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeTranza();
     });
   })();
 

@@ -1215,3 +1215,538 @@ a.nav-cta:active { transform: translateY(1px); }
   .reveal[data-stagger] > * { opacity: 1; transform: none; }
   .card-info.reveal:not(.visible) .donut { transform: none; opacity: 1; }
 }
+
+/* ============================================================
+   EXPEDIENTES — grid de personajes señalados (fichas de dossier)
+   ============================================================ */
+.expedientes { padding: 64px 0 52px; }
+.expedientes-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+.expedientes-head { margin-bottom: 26px; }
+.expedientes-kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin: 0 0 12px;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .14em; font-size: .8rem;
+  color: #fff; background: var(--red);
+  padding: 7px 16px; border-radius: var(--radius-pill);
+}
+.expedientes-kicker-icon { display: grid; place-items: center; }
+.expedientes-kicker-icon svg { width: 16px; height: 16px; }
+
+.expedientes-title {
+  font-weight: 700; color: var(--ink);
+  font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.05;
+}
+.expedientes-sub {
+  margin: 12px 0 0; max-width: 640px;
+  color: var(--muted); font-size: 1rem; line-height: 1.6;
+}
+.expedientes-count {
+  margin: 14px 0 0; font-size: .82rem; font-weight: 600; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+}
+.expedientes-count strong { color: var(--red); font-weight: 700; }
+
+.expedientes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 20px;
+}
+
+/* ---- Ficha ---- */
+.exp-card {
+  position: relative; text-align: left;
+  background: var(--card); border: 0; padding: 0;
+  border-radius: var(--radius-card); box-shadow: var(--shadow-1);
+  overflow: hidden; cursor: pointer;
+  display: flex; flex-direction: column;
+  font: inherit; color: inherit;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.exp-card:hover,
+.exp-card:focus-visible { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+
+/* Pestaña superior tipo fólder */
+.exp-card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px dashed var(--line);
+  background: repeating-linear-gradient(-45deg, transparent 0 10px, rgba(30,35,40,.025) 10px 20px);
+}
+.exp-num {
+  font-family: "Oswald", sans-serif; font-weight: 600;
+  letter-spacing: .16em; font-size: .72rem; color: var(--muted);
+  text-transform: uppercase;
+}
+.exp-status {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .08em; font-size: .62rem;
+  padding: 3px 9px; border-radius: var(--radius-pill); white-space: nowrap;
+}
+.exp-status--doc { background: var(--red); color: #fff; }
+.exp-status--ver { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1.5px var(--line); }
+
+/* Foto / retrato */
+.exp-photo {
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden;
+  background: var(--dark);
+}
+.exp-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  display: block;
+  filter: grayscale(1) contrast(1.04);
+  transition: filter .4s var(--ease), transform .5s var(--ease);
+}
+.exp-card:hover .exp-photo img,
+.exp-card:focus-visible .exp-photo img { filter: grayscale(.1) contrast(1); transform: scale(1.04); }
+
+/* Fallback: monograma cuando no hay fotografía */
+.exp-mono {
+  width: 100%; height: 100%;
+  display: grid; place-items: center; position: relative;
+  background:
+    radial-gradient(420px 200px at 80% -20%, rgba(166,39,31,.35), transparent 65%),
+    linear-gradient(160deg, #23282e 0%, #14171a 70%);
+}
+.exp-mono-initials {
+  font-family: "Oswald", sans-serif; font-weight: 700;
+  font-size: 3.4rem; letter-spacing: .04em;
+  color: rgba(255,255,255,.28); user-select: none;
+}
+.exp-mono-note {
+  position: absolute; top: 12px; left: 0; right: 0;
+  text-align: center;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  letter-spacing: .14em; font-size: .58rem; color: rgba(255,255,255,.35);
+}
+
+/* Sello con el señalamiento */
+.exp-stamp {
+  position: absolute; left: 10px; bottom: 12px; z-index: 1;
+  max-width: calc(100% - 20px);
+  transform: rotate(-6deg);
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 700; letter-spacing: .1em; font-size: .78rem; line-height: 1.25;
+  color: var(--red);
+  border: 2.5px solid currentColor; border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 2px 8px rgba(0,0,0,.28);
+  transition: transform .25s var(--ease);
+}
+.exp-card:hover .exp-stamp { transform: rotate(-3deg) scale(1.04); }
+
+/* Señalamiento en verificación: sello gris, sin el rojo de "documentado" */
+.exp-stamp--ver { color: var(--muted); border-style: dashed; }
+
+/* Cuerpo de la ficha */
+.exp-body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+.exp-nombre {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  letter-spacing: .01em; font-weight: 600;
+  font-size: 1.06rem; line-height: 1.18; color: var(--ink);
+  margin: 0 0 4px;
+}
+.exp-cargo {
+  margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.45; font-weight: 500;
+}
+.exp-card-foot {
+  padding-top: 12px; margin-top: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border-top: 1px solid var(--line);
+  font-size: .76rem; font-weight: 600; color: var(--muted);
+}
+.exp-body { justify-content: space-between; }
+.exp-card-foot .exp-open { color: var(--red); font-weight: 700; white-space: nowrap; }
+
+/* Stagger de entrada */
+.expedientes-grid > .exp-card.visible:nth-child(3n+2) { transition-delay: .08s; }
+.expedientes-grid > .exp-card.visible:nth-child(3n+3) { transition-delay: .16s; }
+.expedientes-grid > .exp-card:hover { transition-delay: 0s; }
+
+.expedientes-disclaimer { margin-top: 22px; max-width: 720px; }
+
+/* ---- Modal expediente ---- */
+.exp-article { padding: 34px 38px 38px; }
+.exp-head {
+  display: flex; gap: 20px; align-items: flex-start;
+  padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px;
+}
+.exp-head-photo {
+  width: 108px; height: 108px; flex: none;
+  border-radius: var(--radius-in); overflow: hidden; background: var(--dark);
+  position: relative;
+}
+.exp-head-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  display: block; filter: grayscale(.15);
+}
+.exp-head-photo .exp-mono-initials { font-size: 2rem; }
+.exp-head-info { min-width: 0; }
+.exp-head-num {
+  font-family: "Oswald", sans-serif; font-weight: 600;
+  letter-spacing: .16em; font-size: .7rem; color: var(--muted);
+  text-transform: uppercase; display: block; margin-bottom: 6px;
+}
+.exp-head-nombre {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 700; font-size: clamp(1.25rem, 3vw, 1.6rem); line-height: 1.1;
+  color: var(--ink); margin: 0 0 6px;
+}
+.exp-head-cargo { margin: 0 0 10px; color: var(--muted); font-size: .9rem; font-weight: 500; }
+
+.exp-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.exp-tag {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .08em; font-size: .66rem;
+  color: var(--red); border: 1.5px solid var(--red); border-radius: 4px;
+  padding: 3px 9px; transform: rotate(-1.5deg);
+  background: rgba(166,39,31,.04);
+}
+
+.exp-article h3 {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  letter-spacing: .02em; font-weight: 600; font-size: 1rem;
+  color: var(--red); margin: 22px 0 10px;
+}
+.exp-article p { margin: 0 0 12px; color: var(--ink); font-size: .93rem; line-height: 1.65; }
+
+.exp-notas-list { list-style: none; margin: 0; padding: 0; }
+.exp-notas-list li {
+  padding: 12px 14px; margin-bottom: 8px;
+  background: var(--page); border-radius: var(--radius-in);
+  border-left: 3px solid var(--red);
+}
+.exp-notas-list a {
+  color: var(--ink); font-weight: 600; font-size: .9rem; line-height: 1.4;
+  text-decoration: none; border-bottom: 1px solid transparent;
+}
+.exp-notas-list a:hover { color: var(--red); border-bottom-color: var(--red); }
+.exp-nota-sin-url { font-weight: 600; font-size: .9rem; color: var(--ink); }
+.exp-nota-meta {
+  display: block; margin-top: 3px;
+  font-size: .74rem; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .05em;
+  font-family: "Oswald", sans-serif;
+}
+.exp-notas-empty {
+  padding: 14px 16px; background: var(--page); border-radius: var(--radius-in);
+  color: var(--muted); font-size: .88rem; font-style: italic;
+}
+.exp-article .disclaimer { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 22px; }
+
+@media (max-width: 620px) {
+  .expedientes { padding: 48px 0 40px; }
+  .expedientes-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .exp-body { padding: 12px 12px 12px; }
+  .exp-nombre { font-size: .95rem; }
+  .exp-stamp { font-size: .68rem; padding: 3px 8px; }
+  .exp-card-foot { font-size: .7rem; }
+  .exp-article { padding: 28px 20px 30px; }
+  .exp-head-photo { width: 84px; height: 84px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exp-card, .exp-photo img, .exp-stamp { transition: none !important; }
+}
+
+/* ============================================================
+   TRANZAS — "Las tranzas del más chueco" (videoteca vertical)
+   ============================================================ */
+.tranzas {
+  background:
+    radial-gradient(1100px 380px at 12% -10%, rgba(166,39,31,.30), transparent 60%),
+    var(--dark);
+  margin-top: 44px;
+  padding: 56px 0 64px;
+}
+.tranzas-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+.tranzas-head { margin-bottom: 30px; }
+.tranzas-kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin: 0 0 10px;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .14em; font-size: .8rem;
+  color: #fff; background: var(--red);
+  padding: 7px 16px; border-radius: var(--radius-pill);
+}
+.tranzas-kicker-icon { display: grid; place-items: center; }
+.tranzas-kicker-icon svg { width: 16px; height: 16px; }
+.tranzas-title {
+  font-weight: 700; color: #fff;
+  font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.05;
+}
+.tranzas-sub {
+  margin: 12px 0 0; max-width: 560px;
+  color: rgba(255,255,255,.72); font-size: 1rem; line-height: 1.6;
+}
+
+.tranzas-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 22px;
+}
+
+/* ---- Tarjeta-teléfono ---- */
+.tranza-card {
+  position: relative; text-align: left;
+  background: #101318; border: 1px solid rgba(255,255,255,.09);
+  border-radius: 30px; padding: 10px 10px 14px;
+  cursor: pointer; color: inherit; font: inherit;
+  box-shadow: 0 12px 34px rgba(0,0,0,.5);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.tranza-card:hover,
+.tranza-card:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(166,39,31,.55);
+  box-shadow: 0 20px 48px rgba(0,0,0,.6);
+}
+
+.tranza-screen {
+  position: relative; overflow: hidden;
+  border-radius: 20px; aspect-ratio: 9 / 16; background: #000;
+}
+.tranza-screen img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .5s var(--ease);
+}
+.tranza-card:hover .tranza-screen img { transform: scale(1.04); }
+
+/* Muesca tipo bocina del teléfono */
+.tranza-screen::before {
+  content: ""; position: absolute; top: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 36%; height: 13px; border-radius: var(--radius-pill);
+  background: rgba(8,9,12,.88); z-index: 2;
+}
+/* Degradado inferior para legibilidad de chips */
+.tranza-screen::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(8,9,12,.20) 0%, rgba(8,9,12,0) 30%, rgba(8,9,12,.45) 100%);
+  pointer-events: none;
+}
+
+.tranza-fwd {
+  position: absolute; top: 30px; left: 10px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: "Public Sans", sans-serif; font-weight: 600;
+  font-size: .62rem; font-style: italic;
+  color: rgba(255,255,255,.85); background: rgba(17,19,23,.72);
+  padding: 4px 10px; border-radius: var(--radius-pill);
+}
+.tranza-fwd svg { width: 11px; height: 11px; flex: none; }
+
+.tranza-play {
+  position: absolute; inset: 0; margin: auto; z-index: 2;
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(166,39,31,.92); color: #fff;
+  box-shadow: 0 6px 22px rgba(0,0,0,.55);
+  transition: transform .25s var(--ease), background .25s var(--ease);
+  pointer-events: none;
+}
+.tranza-play svg { width: 22px; height: 22px; margin-left: 3px; }
+.tranza-card:hover .tranza-play,
+.tranza-card:focus-visible .tranza-play { transform: scale(1.12); background: var(--red); }
+
+.tranza-dur {
+  position: absolute; bottom: 10px; right: 10px; z-index: 2;
+  font-family: "Oswald", sans-serif; font-weight: 600;
+  font-size: .68rem; letter-spacing: .06em;
+  color: #fff; background: rgba(8,9,12,.75);
+  padding: 3px 9px; border-radius: 4px;
+}
+
+.tranza-info { padding: 12px 6px 2px; }
+.tranza-name {
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  letter-spacing: .01em; font-weight: 600;
+  font-size: .98rem; line-height: 1.2; color: #fff;
+  margin: 0 0 6px;
+}
+.tranza-desc {
+  margin: 0; color: rgba(255,255,255,.60);
+  font-size: .78rem; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Stagger de entrada */
+.tranzas-grid > .tranza-card.visible:nth-child(2) { transition-delay: .08s; }
+.tranzas-grid > .tranza-card.visible:nth-child(3) { transition-delay: .16s; }
+.tranzas-grid > .tranza-card.visible:nth-child(4) { transition-delay: .24s; }
+.tranzas-grid > .tranza-card:hover { transition-delay: 0s; }
+
+/* ---- Modal reproductor ---- */
+.tranza-modal {
+  position: fixed; inset: 0; z-index: 3000; display: none;
+  place-items: center; padding: 24px;
+  background: rgba(8,9,12,.92); backdrop-filter: blur(4px);
+}
+.tranza-modal.open { display: grid; }
+.tranza-modal-inner { position: relative; }
+.tranza-player { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.tranza-player video {
+  height: min(78vh, 720px); aspect-ratio: 9 / 16;
+  max-width: 92vw; border-radius: 20px;
+  background: #000; box-shadow: 0 24px 70px rgba(0,0,0,.7);
+  outline: none;
+}
+.tranza-caption {
+  max-width: 420px; text-align: center;
+  color: rgba(255,255,255,.78); font-size: .88rem; line-height: 1.5;
+}
+.tranza-caption strong {
+  display: block; color: #fff;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-size: .95rem; letter-spacing: .02em; margin-bottom: 2px;
+}
+
+@media (max-width: 620px) {
+  .tranzas { padding: 44px 0 50px; }
+  .tranzas-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .tranza-card { border-radius: 22px; padding: 7px 7px 10px; }
+  .tranza-screen { border-radius: 15px; }
+  .tranza-play { width: 44px; height: 44px; }
+  .tranza-play svg { width: 17px; height: 17px; }
+  .tranza-fwd { top: 26px; left: 7px; }
+  .tranza-name { font-size: .85rem; }
+  .tranza-desc { -webkit-line-clamp: 2; font-size: .72rem; }
+  .tranza-player video { height: min(70vh, 640px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tranza-card, .tranza-screen img, .tranza-play { transition: none !important; }
+}
+
+/* ============================================================
+   CARTEL — "Los más buscados: el cartel de Cruz" (tarjeta panorama)
+   ============================================================ */
+.cartel-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin: 4px 0 18px;
+}
+.cartel-cell {
+  position: relative; aspect-ratio: 1 / 1;
+  border: 0; padding: 0; overflow: hidden; cursor: pointer;
+  border-radius: var(--radius-in); background: var(--dark);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+}
+.cartel-cell:hover,
+.cartel-cell:focus-visible { transform: scale(1.045); box-shadow: var(--shadow-1); z-index: 1; }
+
+.cartel-cell img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  display: block; filter: grayscale(1) contrast(1.05);
+  transition: filter .3s var(--ease);
+}
+.cartel-cell:hover img,
+.cartel-cell:focus-visible img { filter: grayscale(.1); }
+
+.cartel-mono {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  font-family: "Oswald", sans-serif; font-weight: 700; font-size: 1.5rem;
+  color: rgba(255,255,255,.35);
+  background: linear-gradient(160deg, #23282e 0%, #14171a 70%);
+}
+
+.cartel-label {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 14px 5px 5px; text-align: center;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; font-size: .56rem; letter-spacing: .06em;
+  line-height: 1.15; color: #fff;
+  background: linear-gradient(180deg, rgba(10,10,12,0) 0%, rgba(10,10,12,.78) 55%);
+  opacity: 0; transition: opacity .2s var(--ease);
+}
+.cartel-cell:hover .cartel-label,
+.cartel-cell:focus-visible .cartel-label { opacity: 1; }
+
+/* Celda central: el jefe del cartel */
+.cartel-cell--jefe {
+  outline: 2.5px solid var(--red); outline-offset: -2.5px;
+}
+.cartel-cell--jefe img { filter: grayscale(.15) contrast(1.05); }
+.cartel-cell--jefe .cartel-label {
+  opacity: 1; color: #fff;
+  background: linear-gradient(180deg, rgba(10,10,12,0) 0%, rgba(166,39,31,.82) 60%);
+  font-size: .6rem; letter-spacing: .1em;
+}
+
+.cartel-hint {
+  margin: 0 0 14px; color: var(--muted);
+  font-size: .8rem; line-height: 1.55;
+}
+
+/* Stagger de entrada del cartel */
+.cartel-grid > .cartel-cell.visible:nth-child(3n+2) { transition-delay: .05s; }
+.cartel-grid > .cartel-cell.visible:nth-child(3n+3) { transition-delay: .1s; }
+.cartel-grid > .cartel-cell:hover { transition-delay: 0s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cartel-cell, .cartel-cell img, .cartel-label { transition: none !important; }
+}
+
+/* ============================================================
+   PANORAMA — bloques de relleno: "vs" (infografía) y mini videoteca
+   ============================================================ */
+.vs-block {
+  margin: 18px 0 16px; padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.vs-title {
+  margin: 0 0 12px;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .1em; font-size: .72rem;
+  color: var(--muted);
+}
+.vs-row { margin-bottom: 12px; }
+.vs-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; margin-bottom: 6px;
+}
+.vs-label { color: var(--muted); font-size: .78rem; font-weight: 500; line-height: 1.35; }
+.vs-num {
+  font-family: "Oswald", sans-serif; font-weight: 600; font-size: 1rem;
+  color: var(--ink); flex: none;
+}
+.vs-num--red { color: var(--red); }
+.vs-bar--discurso { background: #9AA3AD; }
+.vs-bar--datos    { background: var(--red); }
+.vs-fuente {
+  margin: 10px 0 0; font-size: .68rem; color: var(--muted);
+  font-style: italic; line-height: 1.4;
+}
+
+/* Mini videoteca en la tarjeta del video introductorio */
+.video-tranzas {
+  margin: 16px 0 4px; padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.video-tranzas-title {
+  margin: 0 0 8px;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  font-weight: 600; letter-spacing: .1em; font-size: .72rem;
+  color: var(--muted);
+}
+.video-tranza-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; text-align: left;
+  padding: 7px 8px; margin: 0 -8px; box-sizing: content-box;
+  border: 0; background: transparent; border-radius: var(--radius-in);
+  cursor: pointer; font: inherit; color: inherit;
+  transition: background .2s var(--ease);
+}
+.video-tranza-row:hover,
+.video-tranza-row:focus-visible { background: var(--page); }
+.video-tranza-thumb {
+  width: 38px; height: 58px; object-fit: cover; object-position: center;
+  border-radius: 6px; flex: none; display: block;
+  background: var(--dark);
+}
+.video-tranza-meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.video-tranza-titulo {
+  font-weight: 600; font-size: .82rem; color: var(--ink); line-height: 1.25;
+}
+.video-tranza-dur { font-size: .68rem; font-weight: 600; color: var(--muted); font-style: italic; }

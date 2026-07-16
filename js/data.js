@@ -18,47 +18,16 @@ const TEMAS = [
 ];
 
 /* --------------------------------------------------------------------------
-   FOTOS — Gallery placeholders (grid 2x3).
-   gradient: CSS background used as the visual placeholder.
+   CARTEL — "Los más buscados: el cartel de Cruz" (tarjeta del panorama).
+   The grid renders from PERSONAJES (expedientes) around this center cell,
+   following the original hand-drawn mockup. Clicking a face opens its
+   expediente; clicking the center scrolls to #expedientes.
    -------------------------------------------------------------------------- */
-const FOTOS = [
-  {
-    tema: 'Bache',
-    colonia: 'Col. Anáhuac',
-    caption: 'Bache sin reparar sobre vialidad principal — Col. Anáhuac. [EDITAR: fecha y ubicación exacta]',
-    gradient: 'linear-gradient(135deg, #6E1B17 0%, #9E2B25 60%, #C4A575 100%)'
-  },
-  {
-    tema: 'Basura',
-    colonia: 'Col. Felipe Ángeles',
-    caption: 'Acumulación de basura sin recolección — Col. Felipe Ángeles. [EDITAR]',
-    gradient: 'linear-gradient(135deg, #4A5D3A 0%, #14100D 70%, #6E1B17 100%)'
-  },
-  {
-    tema: 'Alumbrado',
-    colonia: 'Col. Chaveña',
-    caption: 'Luminarias apagadas por semanas — Col. Chaveña. [EDITAR]',
-    gradient: 'linear-gradient(135deg, #14100D 0%, #4A5D3A 80%, #C4A575 100%)'
-  },
-  {
-    tema: 'Obra abandonada',
-    colonia: 'Zona Surponiente',
-    caption: 'Obra pública detenida sin fecha de reanudación — Zona Surponiente. [EDITAR]',
-    gradient: 'linear-gradient(135deg, #C4A575 0%, #9E2B25 70%, #1A1714 100%)'
-  },
-  {
-    tema: 'Encharcamiento',
-    colonia: 'Col. Independencia',
-    caption: 'Encharcamiento por drenaje deficiente — Col. Independencia. [EDITAR]',
-    gradient: 'linear-gradient(135deg, #4A5D3A 0%, #C4A575 60%, #9E2B25 100%)'
-  },
-  {
-    tema: 'Vialidad',
-    colonia: 'Av. Tecnológico',
-    caption: 'Señalización y pavimento deteriorados — Av. Tecnológico. [EDITAR]',
-    gradient: 'linear-gradient(135deg, #9E2B25 0%, #1A1714 60%, #4A5D3A 100%)'
-  }
-];
+const CARTEL_CENTRO = {
+  nombre: 'Cruz Pérez Cuéllar',
+  etiqueta: 'El más chueco',
+  foto: 'assets/personajes/cruz-perez-cuellar.jpg'
+};
 
 /* --------------------------------------------------------------------------
    CRONOLOGIA — Timeline of documented cases (2022–2026).
@@ -215,7 +184,7 @@ const NOTAS = [
       { t: 'p', x: 'Además, se descubrió que el propietario original de la vivienda era un exfuncionario y asesor de su propio gobierno, Daniel Pando, lo que disparó acusaciones de conflicto de interés y prestanombres.' },
       { t: 'h', x: '4. Octubre de 2023: el “Fabuloso-gate” de Iván Pérez Ruiz' },
       { t: 'p', x: 'Investigaciones periodísticas revelaron que el gobierno municipal de Juárez otorgó de forma directa cuatro contratos millonarios por 6.5 millones de pesos para la compra de insumos de limpieza como cloro, jabón y desinfectante de la marca Fabuloso.' },
-      { t: 'p', x: 'Dichos contratos fueron asignados a empresas fachada vinculadas directamente a la empresa Maloti S.A. de C.V., propiedad de Iván Pérez Ruiz, entonces director de Desarrollo Económico del Municipio.' },
+      { t: 'p', x: 'Dichos contratos fueron asignados a la empresa fachada Malotti S. de R.L., que comparte domicilios y representantes legales con Le Granel, la cadena de tiendas de productos de limpieza propiedad de Iván Pérez Ruiz, entonces director de Desarrollo Económico del Municipio.' },
       { t: 'p', x: 'Ante la presión del caso, el funcionario renunció a su cargo el 9 de octubre de 2023. Un mes después, en noviembre de 2023, el Congreso del Estado de Chihuahua emitió un exhorto formal para que la Auditoría Superior del Estado revisara los contratos bajo las claves de asignación directa del municipio.' },
       { t: 'p', x: 'El 6 de diciembre de 2023, miembros del PAN y diputados locales interpusieron una denuncia formal ante la Fiscalía Anticorrupción por el presunto delito de corrupción y uso ilegal de atribuciones. Este caso ejemplificó el debate en torno al uso de empresas fachada y licitaciones direccionadas para beneficiar a miembros del gabinete municipal.' },
       { t: 'h', x: '5. Enero de 2024: el “Mochilagate”' },
@@ -311,6 +280,275 @@ const NOTAS = [
       { t: 'p', x: 'De los elementos sancionados, sólo 31 agentes fueron removidos de forma definitiva sin opción a reingreso.' },
       { t: 'p', x: 'Los motivos de los expedientes iban desde el cohecho y abusos arbitrarios de autoridad, pasando por la complicidad con el crimen organizado, hasta acusaciones graves de tortura y violaciones sistemáticas a los derechos humanos, lo que evidencia que los controles de confianza internos permiten la total infiltración del crimen organizado.' }
     ]
+  }
+];
+
+/* --------------------------------------------------------------------------
+   PERSONAJES — "Expedientes" grid: officials and figures under public
+   scrutiny. Editorial rule: estado 'doc' = the señalamiento is documented in
+   published press (red stamp); estado 'ver' = citizen report still being
+   verified (gray dashed stamp + [EDITAR]). Every nota lists its real URL.
+   verificada:false = URL returned by search engines but the site blocked
+   automated reading — open manually before citing.
+   foto: local file in assets/personajes/ (falls back to a monogram).
+   -------------------------------------------------------------------------- */
+const PERSONAJES = [
+  {
+    id: 'enrique-licon',
+    nombre: 'Enrique Licón Chávez',
+    cargo: 'Coordinador de Directores',
+    entidad: 'Municipio de Juárez (desde sep 2024)',
+    estado: 'ver',
+    sello: 'Caso Koraachi',
+    foto: 'assets/personajes/enrique-licon.jpg',
+    fotoCredito: 'Foto: Gobierno Municipal de Juárez (juarez.gob.mx)',
+    resumen: [
+      'Coordinador del gabinete de Cruz Pérez Cuéllar desde septiembre de 2024; antes encabezó la Coordinación de Administración y Control de Proyectos y coordinó la campaña de reelección del alcalde.',
+      'Reportes recibidos directamente por este observatorio lo vinculan al caso del Grupo Koraachi, la constructora más favorecida del gobierno municipal (18 contratos por unos 478 MDP, según Yo Ciudadano). La prensa documenta además su papel operativo: como responsable de Control de Proyectos presentó y dio seguimiento al Distribuidor Vial Talamás–Independencia (~380 MDP), adjudicado al consorcio Akel–Koraachi–Urbanissa y entregado con retraso y sin los accesos peatonales contratados.'
+    ],
+    notas: [
+      { titulo: 'Vigilará Municipio obras en la Talamás', medio: 'El Diario de Juárez', fecha: 'Oct 2023', url: 'https://diario.mx/juarez/2023/oct/06/vigilara-municipio-obras-en-la-talamas-971628.html', verificada: true },
+      { titulo: 'Nombra alcalde a coordinador del Gabinete para nueva administración', medio: 'El Diario de Juárez', fecha: 'Sep 2024', url: 'https://diario.mx/juarez/2024/sep/02/nombra-alcalde-a-coordinador-del-gabinete-para-nueva-administracion-1029525.html', verificada: true },
+      { titulo: 'Enrique Licón será coordinador de Direcciones del Municipio', medio: 'La Verdad Juárez', fecha: 'Sep 2024', url: 'https://laverdadjuarez.com/2024/09/02/enrique-licon-sera-coordinador-de-direcciones-del-municipio/', verificada: true },
+      { titulo: 'De Gexiq a Koraachi: más de 300 mdp en contratos a empresa vinculada a director municipal', medio: 'La Verdad Juárez', fecha: 'Jun 2022', url: 'https://laverdadjuarez.com/2022/06/29/de-gexiq-a-koraachi-mas-de-300-mdp-en-contratos-a-empresa-vinculada-a-director-municipal/', verificada: true }
+    ]
+  },
+  {
+    id: 'jorge-gutierrez-casas',
+    nombre: 'Jorge Gutiérrez Casas',
+    cargo: 'Contralor Municipal',
+    entidad: 'Contraloría / Órgano Interno de Control',
+    estado: 'doc',
+    sello: 'Violencia política',
+    foto: 'assets/personajes/jorge-gutierrez-casas.jpg',
+    fotoCredito: 'Foto: Gobierno Municipal de Juárez (juarez.gob.mx)',
+    resumen: [
+      'Exregidor del PRI (2021–2024), donde coordinó la Comisión de Obras Públicas; hoy titular de la Contraloría por invitación de Cruz Pérez Cuéllar. En marzo de 2022, las regidoras Vanessa Mora y Karla Estrada lo acusaron de violencia política de género por sus expresiones en sesión de Cabildo.',
+      'Reportes recibidos directamente por este observatorio lo vinculan además al caso del Grupo Koraachi. Lo documentado: coordinó la comisión de Obras Públicas justo en el periodo en que Koraachi se convirtió en la contratista más favorecida del municipio, y hoy encabeza la dependencia a la que desde 2022 se le pidió investigar a esa constructora, sin resultados públicos.'
+    ],
+    notas: [
+      { titulo: 'Acusan al regidor Jorge Gutiérrez Casas de violencia política de género', medio: 'ADN / A Diario Network', fecha: 'Mar 2022', url: 'https://www.adiario.mx/estado/juarez/acusan-al-regidor-jorge-gutierrez-casas-de-violencia-politica-de-genero/', verificada: true },
+      { titulo: 'Reordenamiento administrativo fortalece control y transparencia en Juárez', medio: 'El Bordo (entrevista)', fecha: 'Mar 2026', url: 'https://elbordo.com.mx/entrevistas/reordenamiento-administrativo-fortalece-control-y-transparencia-en-juarez-20260310-108945.html', verificada: true },
+      { titulo: 'Las 10 empresas favoritas del Municipio en el primer año de Pérez Cuéllar', medio: 'La Verdad Juárez', fecha: 'Abr 2023', url: 'https://laverdadjuarez.com/2023/04/19/las-10-empresas-favoritas-del-municipio-en-el-primer-ano-de-perez-cuellar/', verificada: true },
+      { titulo: 'Tendrá Contraloría un Reglamento Anticorrupción', medio: 'El Diario de Juárez', fecha: 'Jun 2026', url: 'https://diario.mx/juarez/2026/jun/03/tendra-contraloria-un-reglamento-anticorrupcion-1121090.html', verificada: false }
+    ]
+  },
+  {
+    id: 'julio-cesar-de-la-cruz',
+    nombre: 'Julio César de la Cruz Reyes',
+    cargo: 'Director General de Asentamientos Humanos',
+    entidad: 'Municipio de Juárez (2021–hoy)',
+    estado: 'doc',
+    sello: 'Querella por terrenos',
+    foto: 'assets/personajes/julio-cesar-de-la-cruz.jpg',
+    fotoCredito: 'Foto: Gobierno Municipal de Juárez (juarez.gob.mx)',
+    resumen: [
+      'En julio de 2026 el ciudadano Diego Curiel presentó una querella formal ante la SEDATU en su contra por la entrega irregular de cartas de posesión en terrenos federales y de particulares, que afectaría a unas 1,050 familias de las colonias Conquista, Juanita Luna y Lomas de Poleo; pidió turnar el caso a la FGR.',
+      'No es el primer señalamiento: en 2022 compareció ante el Cabildo por conflictos en colonias irregulares del poniente, donde vecinos lo acusaron de derribar casas y hostigar para apropiarse de terrenos, y en 2024 negó una audiencia pública solicitada por gestores sociales. En junio de 2026 se destapó como aspirante a diputado federal.'
+    ],
+    notas: [
+      { titulo: 'Denuncian irregularidades en predios de la colonia Conquista', medio: 'Puente Libre', fecha: 'Jul 2026', url: 'https://puentelibre.mx/local/denuncia-ciudad-juarez-irregularidad-conquista-asentamientos-humanos/', verificada: true },
+      { titulo: 'Comparecerá ante Cabildo director de Asentamientos Humanos', medio: 'El Diario de Juárez', fecha: 'Mar 2022', url: 'https://diario.mx/juarez/comparecera-ante-cabildo-director-de-asentamientos-humanos-20220323-1912085.html', verificada: true },
+      { titulo: 'Director de Asentamientos Humanos niega derecho de audiencia a grupo ciudadano', medio: 'Norte Digital', fecha: 'Oct 2024', url: 'https://nortedigital.mx/director-de-asentamientos-humanos-niega-derecho-de-audiencia-a-grupo-ciudadano/', verificada: true },
+      { titulo: 'Destapan aspiración de Julio de la Cruz: buscará diputación', medio: 'Puente Libre', fecha: 'Jun 2026', url: 'https://puentelibre.mx/local/destapan-aspiracion-de-julio-de-la-cruz-buscara-diputacion/', verificada: true }
+    ]
+  },
+  {
+    id: 'oscar-guevara',
+    nombre: 'Óscar Guevara Ramírez',
+    cargo: 'Director de Regulación Comercial',
+    entidad: 'Municipio de Juárez (desde jun 2025)',
+    estado: 'ver',
+    sello: 'Venta de licencias',
+    foto: 'assets/personajes/oscar-guevara.jpg',
+    fotoCredito: 'Foto: Puente Libre / Tiempo.com.mx',
+    resumen: [
+      'Director de Regulación Comercial ("Comercio") desde junio de 2025, tras años como coordinador de Comercio Informal en la misma dependencia. Reportes recibidos directamente por este observatorio le atribuyen un esquema de venta de licencias y permisos.',
+      'Lo documentado: en octubre de 2025 comerciantes de mercados protestaron en Presidencia denunciando aumentos en los costos de permisos y presuntos "moches" de inspectores de su dirección; el Municipio lo respaldó y negó los aumentos.'
+    ],
+    notas: [
+      { titulo: '"No hay aumentos en permisos para ambulantes"', medio: 'El Diario de Juárez', fecha: 'Oct 2025', url: 'https://diario.mx/juarez/2025/oct/15/no-hay-aumentos-en-permisos-para-ambulantes-1089532.html', verificada: true },
+      { titulo: 'Óscar Guevara, nuevo director de Regulación Comercial', medio: 'Puente Libre', fecha: 'Jun 2025', url: 'https://puentelibre.mx/local/oscar_guevara_nuevo_director_de_regulacion_comercial_ciudad_juarez_2025/', verificada: true },
+      { titulo: 'Disparado 50% el comercio ambulante', medio: 'El Diario de Juárez', fecha: 'Abr 2026', url: 'https://diario.mx/juarez/2026/apr/02/disparado-50-el-comercio-ambulante-1112303.html', verificada: false }
+    ]
+  },
+  {
+    id: 'claudia-morales',
+    nombre: 'Claudia Verónica Morales Medina',
+    cargo: 'Directora General de Desarrollo Urbano',
+    entidad: 'Municipio de Juárez (2021–hoy)',
+    estado: 'ver',
+    sello: 'Moches',
+    foto: 'assets/personajes/claudia-morales.jpg',
+    fotoCredito: 'Foto: Gobierno Municipal de Juárez (juarez.gob.mx)',
+    resumen: [
+      'Empresaria inmobiliaria (fundadora de Olvera Morales Bienes Raíces y expresidenta de AMPI Juárez), invitada por Cruz Pérez Cuéllar a dirigir Desarrollo Urbano desde 2021. Reportes recibidos directamente por este observatorio le atribuyen el cobro de "moches" en trámites de la dependencia.',
+      'Contexto documentado sobre su dependencia: el expediente 014/2025 del Tribunal Estatal de Justicia Administrativa asienta que, con autorización del Cabildo, la dirección de Desarrollo Urbano pidió a constructoras vehículos, despensas, cemento y pavimento a cambio del 6% de suelo que por ley debía destinarse a escuelas, guarderías y estaciones de bomberos (ver la cronología y la nota del observatorio sobre este caso).'
+    ],
+    notas: [
+      { titulo: 'Presenta Desarrollo Urbano proyectos de inversión para el ejercicio 2026', medio: 'ADN / A Diario Network', fecha: 'Dic 2025', url: 'https://www.adiario.mx/estado/juarez/presenta-desarrollo-urbano-proyectos-de-inversion-para-el-ejercicio-2026/', verificada: true },
+      { titulo: 'Ser profesionista, empresaria y madre en Ciudad Juárez (perfil)', medio: 'Juárez Hoy', fecha: 'Mar 2022', url: 'https://juarezhoy.com.mx/ser-profesionista-empresaria-y-madre-en-ciudad-juarez/', verificada: true }
+    ]
+  },
+  {
+    id: 'cesar-omar-munoz',
+    nombre: 'César Omar Muñoz Morales',
+    cargo: 'Secretario de Seguridad Pública Municipal',
+    entidad: 'SSPM de Juárez (2021–2027)',
+    estado: 'doc',
+    sello: 'Policías infiltrados',
+    foto: 'assets/personajes/cesar-omar-munoz.jpg',
+    fotoCredito: 'Foto: Norte Digital',
+    resumen: [
+      'Titular de la SSPM durante los casos que evidencian la infiltración del crimen en la corporación: el policía activo Galdino Peña Jacinto, "El Monster", detenido en 2025 como sicario de la masacre LeBarón–Langford de Bavispe (2019), reingresó a la corporación en 2024 pasando los exámenes de confianza. Las familias LeBarón exigieron su renuncia y la del alcalde en agosto de 2025.',
+      'Ese mismo mes, dos policías municipales activos murieron como escoltas del narcolíder Ulises Nache, "Delta 1", en un enfrentamiento; Muñoz declaró que "estaban en su día franco". Además, registros de transparencia contradicen sus cifras: se declaraban más de 400 policías dados de baja por malas prácticas, pero los registros oficiales solo reconocen 219 sancionados en cuatro años.'
+    ],
+    notas: [
+      { titulo: 'No me voy: César Muñoz desafía la presión política y apuesta al trabajo', medio: 'Norte Digital', fecha: 'Ago 2025', url: 'https://nortedigital.mx/no-me-voy-cesar-munoz-desafia-la-presion-politica-y-apuesta-al-trabajo-en-entrevista-con-norte-digital/', verificada: true },
+      { titulo: 'Sin aclarar qué hacían policías con el "Delta 1"', medio: 'El Diario de Juárez', fecha: 'Ago 2025', url: 'https://diario.mx/juarez/2025/aug/16/sin-aclarar-que-hacian-policias-con-el-delta-1-1080315.html', verificada: true },
+      { titulo: 'Piden los LeBarón renuncia del alcalde "por encubrir" a sicario en la policía', medio: 'La Verdad Juárez', fecha: 'Ago 2025', url: 'https://laverdadjuarez.com/2025/08/05/piden-los-lebaron-renuncia-del-alcalde-por-encubrir-a-sicario-en-la-policia-perez-cuellar-se-deslinda-del-caso/', verificada: false },
+      { titulo: 'Son 219 los policías de Ciudad Juárez sancionados en 4 años; cifras oficiales contradicen al alcalde', medio: 'La Verdad Juárez', fecha: 'Nov 2025', url: 'https://laverdadjuarez.com/2025/11/18/son-219-los-policias-de-ciudad-juarez-sancionados-en-4-anos-cifras-oficiales-contradicen-al-alcalde/', verificada: false },
+      { titulo: 'Dan de baja a 80 policías municipales en dos administraciones; entre ellos "El Monster"', medio: 'Norte Digital', fecha: 'Ago 2025', url: 'https://nortedigital.mx/dan-de-baja-a-80-policias-municipales-en-dos-administraciones-entre-ellos-el-monster/', verificada: true }
+    ]
+  },
+  {
+    id: 'francisco-ibarra',
+    nombre: 'Francisco Javier Ibarra Molina',
+    cargo: 'Exdirector de la OMEJ y del Instituto del Deporte',
+    entidad: 'Municipio de Juárez (2017–nov 2022)',
+    estado: 'doc',
+    sello: 'Conflicto de interés',
+    foto: 'assets/personajes/francisco-ibarra.jpg',
+    fotoCredito: 'Foto: Juárez Hoy',
+    resumen: [
+      'Siendo director de la Operadora Municipal de Estacionamientos (OMEJ), el Cabildo aprobó vender el terreno del Rastro municipal a Enalte Desarrollos Inmobiliarios —empresa de su hermano y socio Luis Eduardo Ibarra Molina— por 66 MDP a precio de avalúo catastral, según la investigación de Yo Ciudadano. Renunció a la OMEJ en noviembre de 2022 "por cuestiones personales".',
+      'Es socio, junto con su hermano, de al menos seis empresas, entre ellas la constructora Gexiq, gran contratista de obra pública hasta que la Contraloría pidió excluirla en 2016. La investigación "De Gexiq a Koraachi" documenta cómo ese entramado empresarial —asociado a Jorge Quiñónez Verduzco, coaccionista del Grupo Koraachi— acumuló 57 contratos por más de 306 MDP. Koraachi es hoy la contratista más favorecida del gobierno de Pérez Cuéllar.'
+    ],
+    notas: [
+      { titulo: 'Municipio vende terreno del Rastro a hermano y socio de funcionario', medio: 'Yo Ciudadano', fecha: '2022', url: 'https://yociudadano.com.mx/investigaciones/municipio-vende-terreno-del-rastro-a-hermano-y-socio-de-funcionario/', verificada: false },
+      { titulo: 'De Gexiq a Koraachi: más de 300 mdp en contratos a empresa vinculada a director municipal', medio: 'La Verdad Juárez', fecha: 'Jun 2022', url: 'https://laverdadjuarez.com/2022/06/29/de-gexiq-a-koraachi-mas-de-300-mdp-en-contratos-a-empresa-vinculada-a-director-municipal/', verificada: true },
+      { titulo: 'Empresa vinculada a funcionario municipal obtiene contratos millonarios; presentan alto riesgo de corrupción', medio: 'La Verdad Juárez', fecha: 'Oct 2020', url: 'https://laverdadjuarez.com/2020/10/20/empresa-vinculada-a-funcionario-municipal-obtiene-contratos-millonarios-presentan-alto-riesgo-de-corrupcion/', verificada: true },
+      { titulo: 'Renuncia Francisco Ibarra a la dirección de la OMEJ', medio: 'El Diario de Juárez', fecha: 'Nov 2022', url: 'https://diario.mx/juarez/2022/nov/14/renuncia-francisco-ibarra-a-la-direccion-de-la-omej-913676.html', verificada: true }
+    ]
+  },
+  {
+    id: 'ivan-perez',
+    nombre: 'Iván Pérez Ruiz',
+    cargo: 'Presidente de Canaco Juárez',
+    entidad: 'Exdirector de Desarrollo Económico (2021–oct 2023)',
+    estado: 'doc',
+    sello: 'Caso Malotti',
+    foto: 'assets/personajes/ivan-perez.jpg',
+    fotoCredito: 'Foto: InBusiness Woman',
+    resumen: [
+      'Siendo director de Desarrollo Económico, el Municipio otorgó cuatro contratos directos por más de 6.5 MDP a Malotti S. de R.L., una empresa fachada que comparte domicilios y representantes legales con Le Granel, su cadena de tiendas de productos de limpieza, según la investigación de Yo Ciudadano y La Verdad Juárez. Renunció el 9 de octubre de 2023, días después de que los reporteros revisaran las facturas.',
+      'En junio de 2026, Plan Estratégico de Juárez presentó dos denuncias penales ante la Fiscalía Anticorrupción por presunto tráfico de influencias, abuso del servicio público y desvío de recursos o peculado. Hoy preside la Cámara Nacional de Comercio de Ciudad Juárez, reelecto para el periodo 2026–2027.'
+    ],
+    notas: [
+      { titulo: 'Con empresa fachada, Municipio dio contratos millonarios a cadena de tiendas de funcionario', medio: 'La Verdad Juárez / Yo Ciudadano', fecha: 'Oct 2023', url: 'https://laverdadjuarez.com/2023/10/19/con-empresa-fachada-municipio-dio-contratos-millonarios-a-cadena-de-tiendas-de-funcionario/', verificada: false },
+      { titulo: 'Amenazan demandas penales contra Iván Pérez a Canaco Juárez', medio: 'La Opción de Chihuahua', fecha: 'Jun 2026', url: 'https://laopcion.com.mx/juarez/amenazan-demandas-penales-contra-ivan-perez-a-canaco-juarez-20260609-519758.html', verificada: true },
+      { titulo: 'Renuncia Iván Pérez a la Dirección de Desarrollo Económico Municipal', medio: 'La Verdad Juárez', fecha: 'Oct 2023', url: 'https://laverdadjuarez.com/2023/10/09/renuncia-ivan-perez-a-la-direccion-de-desarrollo-economico-municipal/', verificada: false },
+      { titulo: 'Con votación histórica, Canaco elige como nuevo presidente a Iván Pérez', medio: 'Net Noticias', fecha: 'Mar 2025', url: 'https://netnoticias.mx/juarez/con-votacion-historica-canaco-elige-como-nuevo-presidente-a-ivan-perez', verificada: true }
+    ]
+  },
+  {
+    id: 'daniel-pando',
+    nombre: 'Daniel Pando Morales',
+    cargo: 'Exfuncionario municipal y casero del alcalde',
+    entidad: 'Regulación Comercial (2021–2022); Tránsito y Servicios Públicos con Cabada',
+    estado: 'doc',
+    sello: 'Casa de El Campestre',
+    foto: 'assets/personajes/daniel-pando.jpg',
+    fotoCredito: '',
+    resumen: [
+      'Propietario registrado de las dos residencias de El Campestre en el centro del escándalo de enriquecimiento ilícito del alcalde: la casa de la calle Fresno 1564 (comprada en 9.85 MDP en 2022 y rentada a Cruz Pérez Cuéllar en 70 mil pesos mensuales, según Norte Digital) y la de Fresno 1642 (13.7 MDP). El PAN denunció a ambos por enriquecimiento ilícito en noviembre de 2023.',
+      'La Fiscalía Anticorrupción aseguró ambas residencias en abril de 2024 y los tribunales le negaron los amparos con los que intentó recuperarlas. Diputados pidieron a la Auditoría Superior investigar sus ingresos como servidor público y el posible conflicto de interés por su papel de asesor del propio gobierno municipal, señalamiento que el alcalde negó.'
+    ],
+    notas: [
+      { titulo: 'No fue una, sino dos, las residencias de Daniel Pando aseguradas en El Campestre', medio: 'Norte Digital', fecha: 'Abr 2024', url: 'https://nortedigital.mx/son-dos-las-residencias-de-daniel-pando-aseguradas-en-el-campestre/', verificada: true },
+      { titulo: 'Casa del Campestre, la otra Cruz que carga Pérez Cuéllar', medio: 'Norte Digital', fecha: '2023–2024', url: 'https://nortedigital.mx/casa-del-campestre-la-otra-cruz-que-carga-perez-cuellar/', verificada: true },
+      { titulo: 'Piden diputados auditoría al Municipio de Juárez (caso Pando)', medio: 'Congreso de Chihuahua', fecha: 'Oct 2023', url: 'https://www.congresochihuahua.gob.mx/detalleNota.php?id=9434', verificada: true },
+      { titulo: 'Niegan amparo a Daniel Pando por casa asegurada donde vivía Cruz Pérez Cuéllar', medio: 'El Heraldo de Chihuahua', fecha: '2024', url: 'https://www.elheraldodechihuahua.com.mx/local/juarez/niegan-amparo-a-daniel-pando-por-casa-asegurada-donde-vivia-cruz-perez-cuellar-11936919.html', verificada: false }
+    ]
+  },
+  {
+    id: 'carlos-najera',
+    nombre: 'Carlos Nájera Payán',
+    cargo: 'Coordinador General de Comunicación Social (vocero)',
+    entidad: 'Municipio de Juárez (2021–hoy)',
+    estado: 'ver',
+    sello: 'Sobres amarillos',
+    foto: 'assets/personajes/carlos-najera.jpg',
+    fotoCredito: 'Foto: Axión Sin Límite',
+    resumen: [
+      'Vocero del gobierno de Cruz Pérez Cuéllar, ratificado en diciembre de 2024 para el segundo trienio. Reportes recibidos directamente por este observatorio le atribuyen el reparto de "sobres amarillos" (dinero en efectivo) a periodistas.',
+      'Lo que sí está documentado es la cooptación de prensa por la vía formal: bajo su coordinación, el municipio gastó 543.2 MDP en medios y marketing en tres años (La Verdad Juárez), concentrados en unos cuantos medios; investigaciones de 2023 documentaron convenios de publicidad oficial a páginas que no existen o solo replican boletines, y pagos millonarios a exreporteros de la propia oficina de Comunicación Social.'
+    ],
+    notas: [
+      { titulo: 'Gobierno de Ciudad Juárez subsidia la desinformación a través de contratos de publicidad oficial', medio: 'La Verdad Juárez / Yo Ciudadano', fecha: 'Sep 2023', url: 'https://laverdadjuarez.com/2023/09/19/gobierno-de-ciudad-juarez-subsidia-la-desinformacion-a-traves-de-contratos-de-publicidad-oficial/', verificada: false },
+      { titulo: 'En tres años, Pérez Cuéllar gastó 543.2 millones en medios de comunicación y marketing', medio: 'La Verdad Juárez', fecha: 'Oct 2024', url: 'https://laverdadjuarez.com/2024/10/29/en-tres-anos-perez-cuellar-gasto-543-2-millones-en-medios-de-comunicacion-y-marketing/', verificada: false },
+      { titulo: 'Municipio suma un gasto de 207.5 millones de pesos en Comunicación Social, Publicidad y Redes este 2025', medio: 'La Verdad Juárez', fecha: 'Nov 2025', url: 'https://laverdadjuarez.com/2025/11/05/municipio-suma-un-gasto-de-207-5-millones-de-pesos-en-comunicacion-social-publicidad-y-redes-este-2025/', verificada: false },
+      { titulo: 'Ratifican a Carlos Nájera como coordinador de Comunicación Social', medio: 'Net Noticias', fecha: 'Dic 2024', url: 'https://netnoticias.mx/juarez/ratifican-a-carlos-najera-como-coordinador-de-comunicacion-social', verificada: true }
+    ]
+  },
+  {
+    id: 'hector-ortiz-orpinel',
+    nombre: 'Héctor Ortiz Orpinel',
+    cargo: 'Presidente municipal sustituto',
+    entidad: 'Municipio de Juárez (desde jun 2026); antes secretario del Ayuntamiento',
+    estado: 'ver',
+    sello: 'Denuncia de acoso',
+    foto: 'assets/personajes/hector-ortiz-orpinel.jpg',
+    fotoCredito: 'Foto: Puente Libre / Tiempo.com.mx',
+    resumen: [
+      'Alcalde sustituto desde el 17 de junio de 2026, tras la licencia de Cruz Pérez Cuéllar para buscar la gubernatura; fue secretario del Ayuntamiento todo el sexenio y es exdiputado panista converso al proyecto de Morena. Reportes recibidos directamente por este observatorio refieren una denuncia de acoso en su contra.',
+      'Lo documentado en prensa: como alcalde desestimó públicamente las denuncias del PAN contra la administración ("Ni una denuncia les ha pegado en 4 años") y recibió la queja de Anapromex por presunto acoso de agentes de vialidad contra dueños de autos "chuecos", que prometió investigar.'
+    ],
+    notas: [
+      { titulo: '"Ni una denuncia les ha pegado en 4 años": Ortiz al PAN', medio: 'Puente Libre', fecha: 'Jun 2026', url: 'https://puentelibre.mx/local/ni-una-denuncia-les-ha-pegado-en-4-anos-ortiz-al-pan-ciudad-juarez-2026/', verificada: true },
+      { titulo: 'Investigará Municipio supuesto acoso de agentes viales a autos "chuecos"', medio: 'El Diario de Juárez', fecha: 'Jun 2026', url: 'https://diario.mx/juarez/2026/jun/29/investigara-municipio-supuesto-acoso-de-agentes-viales-a-autos-chuecos-1125213.html', verificada: false },
+      { titulo: 'Toma protesta Héctor Ortiz Orpinel como alcalde de Ciudad Juárez', medio: 'El Diario de Juárez', fecha: 'Jun 2026', url: 'https://diario.mx/juarez/2026/jun/17/toma-protesta-hector-ortiz-orpinel-como-alcalde-de-ciudad-juarez-1123331.html', verificada: false }
+    ]
+  }
+];
+
+/* --------------------------------------------------------------------------
+   TRANZAS — "Las tranzas del más chueco": vertical videos (9:16, WhatsApp
+   format) stored in assets/videos/ with a poster frame each.
+   Each: id, titulo, desc, src, poster, dur (mm:ss shown on the card).
+   -------------------------------------------------------------------------- */
+const TRANZAS = [
+  {
+    id: 'tranza-01',
+    titulo: 'Pagamos por protección… al crimen',
+    desc: 'La red de policías municipales que, según investigaciones, terminó escoltando y protegiendo a un líder criminal, mientras la ciudad les paga el sueldo.',
+    src: 'assets/videos/tranza-01.mp4',
+    poster: 'assets/videos/poster-01.jpg',
+    dur: '1:40'
+  },
+  {
+    id: 'tranza-02',
+    titulo: 'Treta judicial con recursos públicos',
+    desc: 'El amparo indirecto con el que el alcalde con licencia litiga —con dinero del erario— para ocultar información que por ley debe ser pública.',
+    src: 'assets/videos/tranza-02.mp4',
+    poster: 'assets/videos/poster-02.jpg',
+    dur: '0:49'
+  },
+  {
+    id: 'tranza-03',
+    titulo: 'La nómina de la parentela',
+    desc: 'Cuñadas, allegados y operadores políticos con sueldos de 85 y 97 mil pesos al mes, cargados al presupuesto de todos los juarenses.',
+    src: 'assets/videos/tranza-03.mp4',
+    poster: 'assets/videos/poster-03.jpg',
+    dur: '1:07'
+  },
+  {
+    id: 'tranza-04',
+    titulo: '¿80 mil pesos mensuales?',
+    desc: 'La pregunta que el municipio se niega a responder: cuántos familiares del alcalde cobran más de 80 mil pesos al mes de la nómina municipal.',
+    src: 'assets/videos/tranza-04.mp4',
+    poster: 'assets/videos/poster-04.jpg',
+    dur: '0:23'
   }
 ];
 
